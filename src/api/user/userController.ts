@@ -5,8 +5,11 @@ import { Keypair } from "@solana/web3.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../../config/config";
+import { Connection,Transaction } from "@solana/web3.js";
 
 
+
+const connection=new Connection("https://api.devnet.solana.com");
 export const SignUp=async(req:Request,res:Response):Promise<any>=>{
     try {
         const {email,password}=req.body;
@@ -36,7 +39,7 @@ export const SignUp=async(req:Request,res:Response):Promise<any>=>{
 
         res.json({
             message:"User created successfully",
-            data:newUser
+            data:newUser.publickey
         });
         
     } catch (error) {
@@ -85,8 +88,25 @@ export const Signin=async(req:Request,res:Response):Promise<any>=>{
 }
 
 
-export const Transaction=async(req:Request, res:Response):Promise<any>=>{
+export const Transac=async(req:Request, res:Response):Promise<any>=>{
     try {
+        const serialTrx=req.body.signature;
+        const tx=await Transaction.from(Buffer.from(serialTrx));
+        const keyPair=Keypair.fromSecretKey(b58.decode(userExist.privateKey));
+        const {blockhash}=await connection.getRecentBlockhash();
+        tx.recentBlockhash=blockhash;
+        tx.feePayer=keyPair.publicKey;
+
+        tx.sign(keyPair);
+        const signature = await connection.sendTransaction(tx, [keyPair])
+    
+    
+        res.json({
+            message: "transacion",
+            signature
+
+        })
+
         
     } catch (error) {
         console.log("error",error);
