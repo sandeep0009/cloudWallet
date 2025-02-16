@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../../config/config";
 import { Connection,Transaction } from "@solana/web3.js";
+import b58 from "bs58";
 
 
 
